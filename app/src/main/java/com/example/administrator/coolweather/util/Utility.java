@@ -1,6 +1,7 @@
 package com.example.administrator.coolweather.util;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.example.administrator.coolweather.db.City;
 import com.example.administrator.coolweather.db.County;
@@ -20,6 +21,7 @@ public class Utility {
                     Province province=new Province();//组装成实体类
                     province.setProvinceName(provinceObject.getString("name"));
                     province.setProvinceCode(provinceObject.getInt("id"));
+                  //  Log.d("queryProvinces","++++++++++++88888888888888888888888888888888888888888888+++++++++++++++++++"+province.getProvinceName());
                     province.save();//储存到数据库
                 }
                 return true;
@@ -29,7 +31,7 @@ public class Utility {
         }
         return false;
     }
-    public static boolean handleCityResponse(String response){//解析和处理服务器返回的市级数据
+    public static boolean handleCityResponse(String response,int provinceId){//解析和处理服务器返回的市级数据
         if (!TextUtils.isEmpty(response)){
             try {
                 JSONArray allCities = new JSONArray(response);
@@ -38,6 +40,8 @@ public class Utility {
                     City city=new City();//组装成实体类
                     city.setCityName(cityObject.getString("name"));
                     city.setCityCode(cityObject.getInt("id"));
+                    city.setProvinceId(provinceId);
+                 //   Log.d("queryProvinces","++++++++++++88888888888888888888888888888888888888888888+++++++++++++++++++"+city.getCityName());
                     city.save();//储存到数据库
                 }
                 return true;
@@ -49,7 +53,7 @@ public class Utility {
     }
 
 
-    public static boolean handleCountyResponse(String response){//解析和处理服务器返回的县级数据
+    public static boolean handleCountyResponse(String response,int cityId){//解析和处理服务器返回的县级数据
         if (!TextUtils.isEmpty(response)){
             try {
                 JSONArray allCounties = new JSONArray(response);
@@ -58,6 +62,7 @@ public class Utility {
                     County county=new County();//组装成实体类
                     county.setCountyName(countyObject.getString("name"));
                     county.setWeatherId(countyObject.getString("weather_id"));
+                    county.setCityId(cityId);
                     county.save();//储存到数据库
                 }
                 return true;
