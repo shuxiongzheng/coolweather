@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.administrator.coolweather.MainActivity;
 import com.example.administrator.coolweather.R;
 import com.example.administrator.coolweather.WeatherActivity;
 import com.example.administrator.coolweather.db.City;
@@ -82,16 +83,22 @@ public class chooseAreaFragment extends Fragment {
 
                     queryCities();
 
-
                 }else if (currentLevel==LEVEL_CITY){
                     seleteCity=cityList.get(position);
                     queryCounties();
                 }else if(currentLevel==LEVEL_COUNTY){
                     String weatherId = countyList.get(position).getWeatherId();
-                    Intent intent = new Intent(getActivity(),WeatherActivity.class);
-                    intent.putExtra("weather_id",weatherId);
-                    startActivity(intent);
-                    getActivity().finish();
+                    if (getActivity() instanceof MainActivity) {//如果当前碎片在MainActivity中
+                        Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                        intent.putExtra("weather_id", weatherId);
+                        startActivity(intent);
+                        getActivity().finish();
+                    }else if (getActivity() instanceof  WeatherActivity){//如果当前碎片在WeatherActivity中
+                        WeatherActivity activity=(WeatherActivity)getActivity();
+                        activity.drawerLayout.closeDrawers();//关闭滑动菜单
+                        activity.swipeRefresh.setRefreshing(true);//打开刷新天气
+                        activity.requestWeather(weatherId);//更新天气
+                    }
                 }
             }
         });
@@ -118,7 +125,6 @@ public class chooseAreaFragment extends Fragment {
             titleText.setText("中国");
             backButton.setVisibility(View.GONE);
             provinceList=DataSupport.findAll(Province.class);
-            Log.d("queryProvinces","+++++++++++++++++++++++++++++++");
             if (provinceList.size()>0){
                 dataList.clear();
                 for (Province province:provinceList){
@@ -127,7 +133,7 @@ public class chooseAreaFragment extends Fragment {
                 adapter.notifyDataSetChanged();
                 listView.setSelection(0);
                 currentLevel=LEVEL_PROVINCE;
-                Log.d("queryProvinces","+++++++++++++++++++++++++++++++");
+
             }else {
                 String address="http://guolin.tech/api/china";
                 Log.d("queryProvinces","-------------------------------+++++++++++++++++");
